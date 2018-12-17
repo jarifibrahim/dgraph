@@ -18,8 +18,11 @@ package cmd
 
 import (
 	goflag "flag"
-	"fmt"
 	"os"
+
+	"github.com/spf13/cobra"
+	flag "github.com/spf13/pflag"
+	"github.com/spf13/viper"
 
 	"github.com/dgraph-io/dgraph/dgraph/cmd/alpha"
 	"github.com/dgraph-io/dgraph/dgraph/cmd/bulk"
@@ -31,9 +34,6 @@ import (
 	"github.com/dgraph-io/dgraph/dgraph/cmd/zero"
 	"github.com/dgraph-io/dgraph/ee/acl/cmd"
 	"github.com/dgraph-io/dgraph/x"
-	"github.com/spf13/cobra"
-	flag "github.com/spf13/pflag"
-	"github.com/spf13/viper"
 )
 
 // RootCmd represents the base command when called without any subcommands
@@ -54,9 +54,13 @@ cluster.
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
+	// Calling goflag.Parse() is unnecessary because we are using cobra and viper, but glog
+	// complains if it is not called. It prints incorrect usage info when it encounters an invalid
+	// flag, however, so ignore errors and let cobra handle them.
+	goflag.CommandLine.Init("dgraph", goflag.ContinueOnError)
 	goflag.Parse()
 	if err := RootCmd.Execute(); err != nil {
-		fmt.Println(err)
+		// error already printed by cobra
 		os.Exit(1)
 	}
 }
