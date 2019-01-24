@@ -35,7 +35,7 @@ import (
 // It also writes any errors to w. A bool is returned to indicate if the param was parsed
 // successfully.
 func intFromQueryParam(w http.ResponseWriter, r *http.Request, name string) (uint64, bool) {
-	str := r.URL.Query().Get(name)
+	str := r.FormValue(name)
 	if len(str) == 0 {
 		w.WriteHeader(http.StatusBadRequest)
 		x.SetStatus(w, x.ErrorInvalidRequest, fmt.Sprintf("%s not passed", name))
@@ -72,7 +72,7 @@ func (st *state) assign(w http.ResponseWriter, r *http.Request) {
 
 	var ids *pb.AssignedIds
 	var err error
-	what := r.URL.Query().Get("what")
+	what := r.FormValue("what")
 	switch what {
 	case "uids":
 		ids, err = st.zero.AssignUids(ctx, num)
@@ -147,7 +147,7 @@ func (st *state) moveTablet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tablet := r.URL.Query().Get("tablet")
+	tablet := r.FormValue("tablet")
 	if len(tablet) == 0 {
 		w.WriteHeader(http.StatusBadRequest)
 		x.SetStatus(w, x.ErrorInvalidRequest, "tablet is a mandatory query parameter")
