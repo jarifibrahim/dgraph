@@ -154,14 +154,12 @@ func queryHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	req.Query = string(body)
 
-	d := r.URL.Query().Get("debug")
+	d := r.FormValue("debug")
 	ctx := context.WithValue(context.Background(), query.DebugKey, d)
 
 	// If ro is set, run this as a readonly query.
-	if ro := r.URL.Query().Get("ro"); len(ro) > 0 && req.StartTs == 0 {
-		if ro == "true" || ro == "1" {
-			req.ReadOnly = true
-		}
+	if ro := r.FormValue("ro"); ro != "" {
+		req.ReadOnly = req.StartTs == 0
 	}
 
 	// Core processing happens here.
